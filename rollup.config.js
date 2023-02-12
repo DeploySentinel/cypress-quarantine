@@ -1,5 +1,4 @@
 import commonjs from '@rollup/plugin-commonjs';
-import copy from 'rollup-plugin-copy';
 import dts from 'rollup-plugin-dts';
 import json from '@rollup/plugin-json';
 import nodeResolve from '@rollup/plugin-node-resolve';
@@ -32,12 +31,7 @@ export default [
     watch: {
       include: 'src/**',
     },
-    plugins: [
-      copy({
-        targets: [{ src: 'src/index.d.ts', dest: 'dist' }],
-      }),
-      ...plugins,
-    ],
+    plugins,
   },
   ...(isProd
     ? [

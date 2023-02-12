@@ -1,65 +1,55 @@
 {
   "name": "@deploysentinel/cypress-quarantine",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   },
   "author": {
     "name": "DeploySentinel"
   },
-  "main": "./dist",
-  "typings": "./dist",
-  "files": [
-    "dist/*"
-  ],
   "scripts": {
-    "prepare": "husky install",
     "clean": "rimraf coverage dist tmp",
     "prebuild": "npm run clean",
     "build": "NODE_ENV=production rollup -c rollup.config.js",
+    "postbuild": "./bin/release-script.sh",
     "ci:unit": "jest --coverage",
     "ci:lint": "yarn lint && yarn tsc --noEmit",
     "dev:unit": "jest --watchAll",
     "prettier": "prettier --config .prettierrc --write .",
     "lint": "eslint . --ext .ts",
-    "dev": "rollup -c rollup.config.js -w"
+    "dev": "rollup -c rollup.config.js -w",
+    "release": "yarn build && yarn changeset publish && git push --follow-tags"
   },
   "dependencies": {
-    "@cypress/commit-info": "^2.2.0",
-    "@deploysentinel/cypress-runner": "^3.2.0",
     "@deploysentinel/debugger-core": "^0.3.4",
+    "ansi-styles": "^6.1.0",
+    "axios": "^1.3.3",
+    "axios-retry": "^3.4.0",
+    "lodash": "^4.17.21"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.26.0",
     "@rollup/plugin-commonjs": "^24.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^13.3.0",
-    "ansi-styles": "^6.1.0",
-    "axios": "^0.27.2",
-    "axios-retry": "^3.3.1",
-    "chrome-remote-interface": "^0.31.3",
-    "cypress": "^12.5.1",
-    "eslint": "^8.30.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "fast-safe-stringify": "^2.1.1",
-    "fast-xml-parser": "^4.0.12",
-    "fflate": "^0.7.4",
-    "husky": "^8.0.2",
-    "lodash": "^4.17.21",
-    "minimatch": "^5.1.1",
-    "rollup": "^2.79.0",
-    "rollup-plugin-copy": "^3.4.0",
-    "rollup-plugin-dts": "^5.1.0",
-    "semver": "^7.3.8",
-    "strip-ansi": "^6.0.1",
-    "typescript": "^4.9.4"
-  },
-  "devDependencies": {
     "@rollup/plugin-terser": "^0.2.1",
     "@types/chrome-remote-interface": "^0.31.7",
     "@types/lodash": "^4.14.191",
-    "cypress": "^12.5.0",
+    "@typescript-eslint/eslint-plugin": "^5.47.1",
+    "@typescript-eslint/parser": "^5.47.1",
+    "cypress": "^12.5.1",
+    "eslint": "^8.30.0",
+    "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-cypress": "^2.12.1",
-    "rollup-plugin-typescript2": "0.33.0"
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.2",
+    "prettier": "^2.8.4",
+    "rollup": "^2.79.0",
+    "rollup-plugin-dts": "^5.1.0",
+    "rollup-plugin-typescript2": "0.33.0",
+    "typescript": "^4.9.5"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
@@ -68,9 +58,6 @@
   "optionalDependencies": {
     "bufferutil": "^4.0.7",
     "utf-8-validate": "^5.0.10"
-  },
-  "bin": {
-    "ds": "./bin/cli"
   },
   "keywords": [
     "cypress",

@@ -1,4 +1,5 @@
 import { defineConfig } from 'cypress';
+import plugin from './dist/plugin';
 
 export default defineConfig({
   projectId: 'tacocat',
@@ -9,37 +10,14 @@ export default defineConfig({
     DEPLOYSENTINEL_API_URL: 'http://localhost:8000/ci',
   },
   e2e: {
-    setupNodeEvents(_on, _config) {
-      const [on, config] = require('./dist/plugin')(_on, _config, {
-        beforeNetworkSend: event => {
-          if (event.url.includes('/me')) {
-            return null;
-          }
-          if (event.url.includes('cdn.jsdelivr.net')) {
-            return null;
-          }
-          return event;
+    setupNodeEvents(on, config) {
+      plugin(on, config, {
+        apiUrl: 'http://localhost:8000/ci/quarantine-tests',
+        meta: {
+          testFramework: 'cypress',
         },
+        getTestId: (titles: string[]) => titles.join(' '),
       });
-
-      on('before:browser:launch', (browser, launchOptions) => {
-        //  Open dev tools in Chrome by default
-        if (browser.name === 'chrome' || browser.name === 'chromium') {
-          launchOptions.args.push('--auto-open-devtools-for-tabs');
-        }
-
-        // Start browsers with prefers-reduced-motion set to "reduce"
-        if (browser.family === 'firefox') {
-          launchOptions.preferences['ui.prefersReducedMotion'] = 1;
-        }
-
-        if (browser.family === 'chromium') {
-          launchOptions.args.push('--force-prefers-reduced-motion');
-        }
-
-        return launchOptions;
-      });
-
       return config;
     },
   },
