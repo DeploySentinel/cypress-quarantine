@@ -13,6 +13,8 @@ export default (
   const cypressVersion = config['version'];
   const envs = config['env'];
 
+  log('Starting plugin...')
+
   on('before:run', (runDetails: Cypress.BeforeRunDetails) => {
     const { browser, group, parallel, system, tag, config } = runDetails;
   });

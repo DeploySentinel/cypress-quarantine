@@ -36,7 +36,6 @@
     "axios": "^0.27.2",
     "axios-retry": "^3.3.1",
     "chrome-remote-interface": "^0.31.3",
-    "cypress": "^12.5.1",
     "eslint": "^8.30.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
@@ -57,7 +56,7 @@
     "@rollup/plugin-terser": "^0.2.1",
     "@types/chrome-remote-interface": "^0.31.7",
     "@types/lodash": "^4.14.191",
-    "cypress": "^12.5.0",
+    "cypress": "^12.5.1",
     "eslint-plugin-cypress": "^2.12.1",
     "rollup-plugin-typescript2": "0.33.0"
   },
