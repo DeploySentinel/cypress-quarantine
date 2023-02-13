@@ -11,7 +11,12 @@ export default defineConfig({
   },
   e2e: {
     setupNodeEvents(on, config) {
-      plugin(on, config);
+      plugin(on, config, {
+        apiUrl: 'http://localhost:8000/skip-tests',
+        meta: {
+          teamId: '123456',
+        }
+      });
       return config;
     },
   },
