@@ -12,9 +12,9 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       plugin(on, config, {
-        apiUrl: 'http://localhost:8000/skip-tests',
+        apiUrl: 'http://localhost:8000/ci/quarantine-tests',
         meta: {
-          teamId: '123456',
+          testFramework: 'cypress',
         }
       });
       return config;
