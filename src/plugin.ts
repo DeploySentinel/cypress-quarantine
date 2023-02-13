@@ -51,10 +51,10 @@ type ExtraConfig = {
 };
 
 const log = (message: string) =>
-  console.log(`${styles.yellow.open}${message}${styles.yellow.close}`);
+  console.log(`${styles.yellow.open}[cypress-quarantine] ${message}${styles.yellow.close}`);
 
 const error = (message: any) =>
-  console.log(`${styles.red.open}${message}${styles.red.close}`);
+  console.log(`${styles.red.open}[cypress-quarantine] ${message}${styles.red.close}`);
 
 const axiosInstance = buildAxiosInstance({
   timeout: 60000,
@@ -102,7 +102,7 @@ export default (
   const skippedTestCasesPerSpec = new Map<string, Record<string, any>>();
   const gitClient = new GitClient({
     // FIXME: this should be optional
-    error, 
+    error,
   } as any);
 
   log('Starting plugin...');
@@ -127,7 +127,12 @@ export default (
           skippedTestCasesPerSpec.set(path, skippedTestCases as any);
         }
         if (isPlainObject(skippedTestCases)) {
-          const shouldSkip = Boolean(get(skippedTestCases, titles));
+          const shouldSkip = Boolean(
+            get(
+              skippedTestCases,
+              extraConfig.nestedPaths ? titles : titles[titles.length - 1],
+            ),
+          );
           if (shouldSkip) {
             log(`Quarantining test ${path} > ${titles.join(' ')}`);
           }
