@@ -30,7 +30,6 @@ export const fetchSkippedTestCases = async (
   url: string,
   payload: {
     path: string;
-    titles: string[];
     meta: Record<string, any>;
   },
   topLevelKey?: string,
@@ -83,7 +82,6 @@ export default (
           log(`Fetching skipped tests for spec: ${path}`);
           skippedTestCases = await fetchSkippedTestCases(extraConfig.apiUrl, {
             path,
-            titles,
             meta: {
               cypressVersion,
               ...extraConfig.meta,
