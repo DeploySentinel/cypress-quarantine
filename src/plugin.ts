@@ -1,9 +1,38 @@
 import crypto from 'crypto';
 
-import isPlainObject from 'lodash/isPlainObject';
+import axios, { AxiosRequestConfig } from 'axios';
+import axiosRetry, {
+  exponentialDelay,
+  isNetworkError,
+  isRetryableError,
+} from 'axios-retry';
 import get from 'lodash/get';
+import isPlainObject from 'lodash/isPlainObject';
 import styles from 'ansi-styles';
-import { api } from '@deploysentinel/debugger-core';
+
+export const buildAxiosInstance = (config: AxiosRequestConfig) => {
+  // patch headers
+  config.headers = {
+    ...config.headers,
+    'x-msw-bypass': 'true', // in case the client has msw enabled
+  };
+  const instance = axios.create(config);
+  axiosRetry(instance, {
+    retries: 3,
+    retryDelay: exponentialDelay,
+    retryCondition: error => {
+      if (isNetworkError(error)) {
+        return true;
+      }
+      if (!error.config) {
+        // Cannot determine if the request can be retried
+        return false;
+      }
+      return isRetryableError(error);
+    },
+  });
+  return instance;
+};
 
 type ExtraConfig = {
   apiUrl: string;
@@ -20,6 +49,12 @@ type ExtraConfig = {
   nestedPaths?: boolean;
 };
 
+const axiosInstance = buildAxiosInstance({
+  timeout: 60000,
+  maxContentLength: Infinity,
+  maxBodyLength: Infinity,
+});
+
 const log = (message: string) =>
   console.log(`${styles.yellow.open}${message}${styles.yellow.close}`);
 
@@ -35,11 +70,6 @@ export const fetchSkippedTestCases = async (
   topLevelKey?: string,
 ) => {
   try {
-    const axiosInstance = api.buildAxiosInstance({
-      timeout: 60000,
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-    });
     const resp: any = await axiosInstance.post(url, payload);
     if (isPlainObject(resp.data)) {
       return topLevelKey ? resp.data[topLevelKey] : resp.data;
@@ -83,6 +113,7 @@ export default (
           skippedTestCases = await fetchSkippedTestCases(extraConfig.apiUrl, {
             path,
             meta: {
+              envs,
               cypressVersion,
               ...extraConfig.meta,
             },
