@@ -1,11 +1,23 @@
 import crypto from 'crypto';
 
+import isPlainObject from 'lodash/isPlainObject';
+import get from 'lodash/get';
 import styles from 'ansi-styles';
-import { api, utils } from '@deploysentinel/debugger-core';
+import { api } from '@deploysentinel/debugger-core';
 
 type ExtraConfig = {
   apiUrl: string;
-  meta: Record<string, unknown>; // extra static data attached to payload
+  meta?: Record<string, unknown>; // extra static data attached to payload
+  // the response data has nested test cases
+  // ex:
+  // {
+  //   descriptionA: {
+  //      descriptionB: {
+  //        testCase: true,
+  //      }
+  //   }
+  // }
+  nestedPaths?: boolean;
 };
 
 const log = (message: string) =>
@@ -30,7 +42,7 @@ export const fetchSkippedTestCases = async (
       maxBodyLength: Infinity,
     });
     const resp: any = await axiosInstance.post(url, payload);
-    if (utils.validators.isObject(resp.data)) {
+    if (isPlainObject(resp.data)) {
       return topLevelKey ? resp.data[topLevelKey] : resp.data;
     }
     return null;
@@ -58,39 +70,40 @@ export default (
 ): [Cypress.PluginEvents, Cypress.PluginConfigOptions] => {
   const cypressVersion = config['version'];
   const envs = config['env'];
+  const skippedTestCasesPerSpec = new Map<string, Record<string, any>>();
 
   log('Starting plugin...');
 
   on('task', {
     onSkip: async ({ path, titles }: { path: string; titles: string[] }) => {
-      log(`Getting test id for ${path} > ${titles.join('-')}`);
       try {
-        const skippedTestCases = await fetchSkippedTestCases(
-          extraConfig.apiUrl,
-          {
+        // pull from cache
+        let skippedTestCases = skippedTestCasesPerSpec.get(path);
+        if (!skippedTestCases) {
+          log(`Fetching skipped tests for spec: ${path}`);
+          skippedTestCases = await fetchSkippedTestCases(extraConfig.apiUrl, {
             path,
             titles,
             meta: {
               cypressVersion,
               ...extraConfig.meta,
             },
-          },
-        );
+          });
+          skippedTestCasesPerSpec.set(path, skippedTestCases as any);
+        }
+        if (isPlainObject(skippedTestCases)) {
+          const shouldSkip = Boolean(get(skippedTestCases, titles));
+          if (shouldSkip) {
+            log(`Quarantining test ${path} > ${titles.join(' ')}`);
+          }
+          return shouldSkip;
+        }
       } catch (e) {
         error(e);
       }
       return null;
     },
   });
-
-  on(
-    'after:run',
-    async (
-      runResults:
-        | CypressCommandLine.CypressRunResult
-        | CypressCommandLine.CypressFailedRunResult,
-    ) => {},
-  );
 
   return [on, config];
 };
