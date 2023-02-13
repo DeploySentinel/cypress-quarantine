@@ -6,6 +6,7 @@ import axiosRetry, {
   isNetworkError,
   isRetryableError,
 } from 'axios-retry';
+import { GitClient } from '@deploysentinel/debugger-core';
 import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
 import styles from 'ansi-styles';
@@ -49,19 +50,18 @@ type ExtraConfig = {
   nestedPaths?: boolean;
 };
 
-const axiosInstance = buildAxiosInstance({
-  timeout: 60000,
-  maxContentLength: Infinity,
-  maxBodyLength: Infinity,
-});
-
 const log = (message: string) =>
   console.log(`${styles.yellow.open}${message}${styles.yellow.close}`);
 
 const error = (message: any) =>
   console.log(`${styles.red.open}${message}${styles.red.close}`);
 
-export const fetchSkippedTestCases = async (
+const axiosInstance = buildAxiosInstance({
+  timeout: 60000,
+  maxContentLength: Infinity,
+  maxBodyLength: Infinity,
+});
+const fetchSkippedTestCases = async (
   url: string,
   payload: {
     path: string;
@@ -100,12 +100,17 @@ export default (
   const cypressVersion = config['version'];
   const envs = config['env'];
   const skippedTestCasesPerSpec = new Map<string, Record<string, any>>();
+  const gitClient = new GitClient({
+    // FIXME: this should be optional
+    error, 
+  } as any);
 
   log('Starting plugin...');
 
   on('task', {
     onSkip: async ({ path, titles }: { path: string; titles: string[] }) => {
       try {
+        const commitInfo = await gitClient.getCommitInfo();
         // pull from cache
         let skippedTestCases = skippedTestCasesPerSpec.get(path);
         if (!skippedTestCases) {
@@ -115,6 +120,7 @@ export default (
             meta: {
               envs,
               cypressVersion,
+              commitInfo,
               ...extraConfig.meta,
             },
           });
