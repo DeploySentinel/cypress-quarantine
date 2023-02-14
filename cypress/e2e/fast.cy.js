@@ -15,7 +15,7 @@ after(() => {
   cy.log('After all hook in test');
 });
 
-it('Searches Wikipedia for Milk Tea', () => {
+it('visits a website', () => {
   // Click on <input> #searchInput
   cy.get('#searchInput').click();
 

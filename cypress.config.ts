@@ -15,7 +15,8 @@ export default defineConfig({
         apiUrl: 'http://localhost:8000/ci/quarantine-tests',
         meta: {
           testFramework: 'cypress',
-        }
+        },
+        getTestName: (titles: string[]) => titles.join(' '),
       });
       return config;
     },
