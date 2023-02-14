@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import axios, { AxiosRequestConfig } from 'axios';
 import axiosRetry, {
   exponentialDelay,
@@ -7,10 +5,13 @@ import axiosRetry, {
   isRetryableError,
 } from 'axios-retry';
 import { GitClient } from '@deploysentinel/debugger-core';
-import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
+import lGet from 'lodash/get';
 import styles from 'ansi-styles';
 
+import { version as PKG_VERSION } from '../package.json';
+
+// TODO: custom headers support ??
 export const buildAxiosInstance = (config: AxiosRequestConfig) => {
   // patch headers
   config.headers = {
@@ -39,6 +40,7 @@ type ExtraConfig = {
   apiUrl: string;
   meta?: Record<string, unknown>; // extra static data attached to payload
   getTestId?: (titles: string[]) => string; // can specify the callback to build up unique test id
+  topLevelKey?: string; // in case api response includes top level key
 };
 
 const log = (message: string) =>
@@ -76,17 +78,6 @@ const fetchSkippedTestCases = async (
   }
 };
 
-export const sha1 = (value: string) =>
-  crypto.createHash('sha1').update(value).digest('hex');
-
-export const getTestId = (path: string, titles: string[]) =>
-  sha1(
-    JSON.stringify({
-      path,
-      titles,
-    }),
-  );
-
 export default (
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions,
@@ -100,7 +91,7 @@ export default (
     error,
   } as any);
 
-  log('Starting plugin...');
+  log(`Starting plugin [v${PKG_VERSION}]...`);
 
   on('task', {
     onSkip: async ({ path, titles }: { path: string; titles: string[] }) => {
@@ -110,20 +101,24 @@ export default (
         let skippedTestCases = skippedTestCasesPerSpec.get(path);
         if (!skippedTestCases) {
           log(`Fetching skipped tests for spec: ${path}`);
-          skippedTestCases = await fetchSkippedTestCases(extraConfig.apiUrl, {
-            path,
-            meta: {
-              envs,
-              cypressVersion,
-              commitInfo,
-              ...extraConfig.meta,
+          skippedTestCases = await fetchSkippedTestCases(
+            extraConfig.apiUrl,
+            {
+              path,
+              meta: {
+                envs,
+                cypressVersion,
+                commitInfo,
+                ...extraConfig.meta,
+              },
             },
-          });
+            extraConfig.topLevelKey,
+          );
           skippedTestCasesPerSpec.set(path, skippedTestCases as any);
         }
         if (isPlainObject(skippedTestCases)) {
           const shouldSkip = Boolean(
-            get(
+            lGet(
               skippedTestCases,
               extraConfig.getTestId
                 ? extraConfig.getTestId(titles)

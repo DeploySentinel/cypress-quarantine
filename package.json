@@ -23,7 +23,8 @@
     "dev:unit": "jest --watchAll",
     "prettier": "prettier --config .prettierrc --write .",
     "lint": "eslint . --ext .ts",
-    "dev": "rollup -c rollup.config.js -w"
+    "dev": "rollup -c rollup.config.js -w",
+    "release": "yarn build && yarn changeset publish && git push --follow-tags"
   },
   "dependencies": {
     "@deploysentinel/debugger-core": "^0.3.4",
