@@ -1,7 +1,7 @@
 {
   "name": "@deploysentinel/cypress-quarantine",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "publishConfig": {
     "access": "public"
   },
@@ -61,9 +61,6 @@
   "optionalDependencies": {
     "bufferutil": "^4.0.7",
     "utf-8-validate": "^5.0.10"
-  },
-  "bin": {
-    "ds": "./bin/cli"
   },
   "keywords": [
     "cypress",
