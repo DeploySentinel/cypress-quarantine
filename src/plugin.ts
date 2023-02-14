@@ -1,5 +1,3 @@
-import crypto from 'crypto';
-
 import axios, { AxiosRequestConfig } from 'axios';
 import axiosRetry, {
   exponentialDelay,
@@ -11,6 +9,9 @@ import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
 import styles from 'ansi-styles';
 
+import { version as PKG_VERSION } from '../package.json';
+
+// TODO: custom headers support ??
 export const buildAxiosInstance = (config: AxiosRequestConfig) => {
   // patch headers
   config.headers = {
@@ -76,17 +77,6 @@ const fetchSkippedTestCases = async (
   }
 };
 
-export const sha1 = (value: string) =>
-  crypto.createHash('sha1').update(value).digest('hex');
-
-export const getTestId = (path: string, titles: string[]) =>
-  sha1(
-    JSON.stringify({
-      path,
-      titles,
-    }),
-  );
-
 export default (
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions,
@@ -100,7 +90,7 @@ export default (
     error,
   } as any);
 
-  log('Starting plugin...');
+  log(`Starting plugin [v${PKG_VERSION}]...`);
 
   on('task', {
     onSkip: async ({ path, titles }: { path: string; titles: string[] }) => {
