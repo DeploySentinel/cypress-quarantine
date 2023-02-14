@@ -43,10 +43,11 @@ export default defineConfig({
           testFramework: 'cypress',
           // or any custom static metadata
         },
-        // specify how to generate unique test id based on titles
+        // specify the method that generates unique test id based on titles
         // ex: titles: ['describe A', 'test case B'] -> 'describe A > test case B' (stored in db)
-        // default to only test case name
-        getTestId: (titles: string[]) => titles.join('>'),
+        // default to only test case name (leaf node); 'test case B' in this case
+        getTestId: (titles: string[]) => titles.join(' > '),
+        topLevelKey: 'xxx', // optional
       });
       return config;
     },
@@ -69,6 +70,19 @@ The plugin has the ability to create a distinctive test ID through the use of `g
 which is derived from the hierarchical titles of nested tests.
 In the API response, the test ID serves as the primary identifier that corresponds to a boolean value indicating 
 whether the test case should be quarantined or not.
+
+### API Response Top Level Key
+In case the API response includes top level key, for example:
+```
+{
+    data: {
+        'describe A > test case B': true,
+        'describe A > test case C': false,
+        ...
+    }
+}
+```
+Within the plugin configuration, you can include `data` in the `topLevelKey` field.
 
 ### Custom Metadata
 
