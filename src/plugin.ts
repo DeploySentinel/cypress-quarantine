@@ -38,16 +38,7 @@ export const buildAxiosInstance = (config: AxiosRequestConfig) => {
 type ExtraConfig = {
   apiUrl: string;
   meta?: Record<string, unknown>; // extra static data attached to payload
-  // the response data has nested test cases
-  // ex:
-  // {
-  //   descriptionA: {
-  //      descriptionB: {
-  //        testCase: true,
-  //      }
-  //   }
-  // }
-  getTestName?: (titles: string[]) => string;
+  getTestName?: (titles: string[]) => string; // can specify the callback to build up unique test case name
 };
 
 const log = (message: string) =>
