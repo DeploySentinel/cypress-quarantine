@@ -28,7 +28,7 @@ import "./commands";
 
 In your Cypress project's **plugin** file (ex. `cypress.config.ts`) add:
 
-```js
+```ts
 import { defineConfig } from 'cypress';
 import cyQuarantine from '@deploysentinel/cypress-quarantine/plugin';
 
@@ -75,14 +75,23 @@ whether the test case should be quarantined or not.
 The API request body includes a few default custom fields by default.
 You can utilize this information to develop a test quarantine algorithm.
 
-```
+```ts
 {
-    cypressVesion: 'xxx',
-    envs: {
-        // test environment variables
-    },
+    cypressVesion: string;
+    // test environment variables
+    envs: Record<string, string>;
+    // git information
     commitInfo: {
-        // git commit information
+      authorEmail: string | null;
+      authorName: string | null;
+      branch: string | null;
+      defaultBranch: string | null;
+      message: string | null;
+      remoteBranch: string | null;
+      remoteOrigin: string | null;
+      sha: string | null;
+      timestamp: number | null;
+      metadata: unknown | null;
     },
 }
 ```
