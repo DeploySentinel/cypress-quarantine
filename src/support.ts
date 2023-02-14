@@ -11,11 +11,7 @@ export const getTestTitles = (
     titles.unshift(cypressTest.title);
   }
 
-  getTestTitles(
-    cypressTest.parent,
-    titles,
-    currentDepth + 1,
-  );
+  getTestTitles(cypressTest.parent, titles, currentDepth + 1);
 };
 
 // Global vars
