@@ -47,14 +47,18 @@ type ExtraConfig = {
   //      }
   //   }
   // }
-  nestedPaths?: boolean;
+  getTestName?: (titles: string[]) => string;
 };
 
 const log = (message: string) =>
-  console.log(`${styles.yellow.open}[cypress-quarantine] ${message}${styles.yellow.close}`);
+  console.log(
+    `${styles.yellow.open}[cypress-quarantine] ${message}${styles.yellow.close}`,
+  );
 
 const error = (message: any) =>
-  console.log(`${styles.red.open}[cypress-quarantine] ${message}${styles.red.close}`);
+  console.log(
+    `${styles.red.open}[cypress-quarantine] ${message}${styles.red.close}`,
+  );
 
 const axiosInstance = buildAxiosInstance({
   timeout: 60000,
@@ -130,7 +134,9 @@ export default (
           const shouldSkip = Boolean(
             get(
               skippedTestCases,
-              extraConfig.nestedPaths ? titles : titles[titles.length - 1],
+              extraConfig.getTestName
+                ? extraConfig.getTestName(titles)
+                : titles[titles.length - 1],
             ),
           );
           if (shouldSkip) {
