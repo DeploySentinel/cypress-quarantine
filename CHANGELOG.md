@@ -1,5 +1,12 @@
 # @deploysentinel/cypress-quarantine
 
+## 0.1.3
+
+### Patch Changes
+
+- 6eed6a3b: docs: update README
+- 26aca55a: perf: call fetchTestsToBeQuarantined task in before hook
+
 ## 0.1.2
 
 ### Patch Changes
