@@ -1,31 +1,33 @@
-before(() => {
-  cy.log('Before all hook in test');
-  cy.visit('https://www.wikipedia.org');
-});
+describe('describe A', () => {
+  it('visits a website (should be skipped)', () => {
+    cy.visit('https://www.wikipedia.org');
+    // Click on <input> #searchInput
+    cy.get('#searchInput').click();
 
-beforeEach(() => {
-  cy.log('Before each hook in test');
-});
+    // Fill "milk tea" on <input> #searchInput
+    cy.get('#searchInput').type('milk tea');
 
-afterEach(() => {
-  cy.log('After each hook in test');
-});
+    // Press Enter on input
+    cy.get('#searchInput').type('{Enter}');
 
-after(() => {
-  cy.log('After all hook in test');
-});
+    cy.get('#firstHeading').should('include.text', 'Milk tea');
 
-it('visits a website', () => {
-  // Click on <input> #searchInput
-  cy.get('#searchInput').click();
+    cy.get('[href="/wiki/Tea"]').click();
+  });
 
-  // Fill "milk tea" on <input> #searchInput
-  cy.get('#searchInput').type('milk tea');
+  it('visits a website (should pass)', () => {
+    cy.visit('https://www.wikipedia.org');
+    // Click on <input> #searchInput
+    cy.get('#searchInput').click();
 
-  // Press Enter on input
-  cy.get('#searchInput').type('{Enter}');
+    // Fill "milk tea" on <input> #searchInput
+    cy.get('#searchInput').type('milk tea');
 
-  cy.get('#firstHeading').should('include.text', 'Milk tea');
+    // Press Enter on input
+    cy.get('#searchInput').type('{Enter}');
 
-  cy.get('[href="/wiki/Milk"]').click();
+    cy.get('#firstHeading').should('include.text', 'Milk tea');
+
+    cy.get('[href="/wiki/Milk"]').click();
+  });
 });

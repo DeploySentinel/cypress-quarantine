@@ -85,7 +85,10 @@ export default (
 ): [Cypress.PluginEvents, Cypress.PluginConfigOptions] => {
   const cypressVersion = config['version'];
   const envs = config['env'];
-  const testsToBeQuarantinedPerSpec = new Map<string, Record<string, boolean>>();
+  const testsToBeQuarantinedPerSpec = new Map<
+    string,
+    Record<string, boolean>
+  >();
   const gitClient = new GitClient({
     // FIXME: this should be optional
     error,

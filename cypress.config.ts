@@ -10,7 +10,7 @@ export default defineConfig({
         meta: {
           testFramework: 'cypress',
         },
-        getTestId: (titles: string[]) => titles.join(' '),
+        getTestId: (titles: string[]) => titles.join(' > '),
       });
       return config;
     },
