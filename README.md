@@ -1,10 +1,11 @@
 # DeploySentinel Cypress Quarantine
 
-Cypress plugin that helps devs to quarantine tests dynamically
+DeploySentinel Cypress Quarantine is a plugin for Cypress that helps developers quarantine tests dynamically.
+With this plugin, you can dynamically skip tests that are unstable, flaky, or not ready to run based off an API call made at test time.
 
 ## Installation
 
-Install the Cypress plugin into your Cypress project.
+To install the Cypress plugin, run:
 
 ```sh
 npm install -D @deploysentinel/cypress-quarantine
@@ -37,13 +38,15 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       cyQuarantine(on, config, {
-        // api that tells which tests to skip per spec file (required)
+        // your custom API endpoint that returns which tests to skip per spec file (required)
         apiUrl: 'http://localhost:8000/ci/quarantine-tests',
         meta: {
           testFramework: 'cypress',
           // or any custom static metadata (optional)
         },
-        // specify the method that generates unique test id based on nested test block titles (optional)
+        // specify the method that generates unique test id based on titles
+        // ex: titles: ['describe A', 'test case B'] -> 'describe A > test case B' (stored in db)
+        // default to only test case name (leaf node); 'test case B' in this case
         getTestId: (titles: string[]) => titles.join(' > '),
         topLevelKey: 'xxx', // (optional)
       });
@@ -65,7 +68,21 @@ The resulting API response should look like
 }
 ```
 The key is a unique test ID derived from `getTestId`.
-And the value indicates whether the test case should be quarantined or not.
+And the value indicates whether the test case should be skipped (quarantined).
+
+### Top Level API Key
+In case the API response has top level key attached, for example:
+```
+{
+    data: {
+        'describe A > test case B': true,
+        'describe A > test case C': false,
+        ...
+    }
+}
+```
+You can set `topLevelKey` field in config to `data` in this case.
+
 
 ### Custom Metadata
 
