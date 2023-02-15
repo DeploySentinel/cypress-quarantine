@@ -19,6 +19,10 @@ const getTestTitles = (
 // const isComponentTest = Boolean(Cypress.config('devServer' as any));
 const getFilePath = () => Cypress.spec.relative;
 
+before(function() {
+  cy.task('fetchTestsToBeQuarantined', getFilePath());
+})
+
 beforeEach(function () {
   const currentTest = this.currentTest;
   if (currentTest) {
