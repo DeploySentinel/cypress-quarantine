@@ -55,10 +55,7 @@
     "**/*": "prettier --write --ignore-unknown",
     "*.ts": "eslint"
   },
-  "optionalDependencies": {
-    "bufferutil": "^4.0.7",
-    "utf-8-validate": "^5.0.10"
-  },
+  "optionalDependencies": {},
   "keywords": [
     "cypress",
     "plugin",
