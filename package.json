@@ -3,21 +3,17 @@
   "license": "MIT",
   "version": "0.1.0",
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "directory": "dist"
   },
   "author": {
     "name": "DeploySentinel"
   },
-  "main": "./dist",
-  "typings": "./dist",
-  "files": [
-    "dist/*"
-  ],
   "scripts": {
-    "prepare": "husky install",
     "clean": "rimraf coverage dist tmp",
     "prebuild": "npm run clean",
     "build": "NODE_ENV=production rollup -c rollup.config.js",
+    "postbuild": "./bin/release-script.sh",
     "ci:unit": "jest --coverage",
     "ci:lint": "yarn lint && yarn tsc --noEmit",
     "dev:unit": "jest --watchAll",
