@@ -1,4 +1,4 @@
-export const getTestTitles = (
+const getTestTitles = (
   cypressTest: Mocha.Test | Mocha.Suite | undefined,
   titles: string[],
   currentDepth = 0,

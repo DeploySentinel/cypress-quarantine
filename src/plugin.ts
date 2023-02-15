@@ -12,7 +12,7 @@ import styles from 'ansi-styles';
 import { version as PKG_VERSION } from '../package.json';
 
 // TODO: custom headers support ??
-export const buildAxiosInstance = (config: AxiosRequestConfig) => {
+const buildAxiosInstance = (config: AxiosRequestConfig) => {
   // patch headers
   config.headers = {
     ...config.headers,
