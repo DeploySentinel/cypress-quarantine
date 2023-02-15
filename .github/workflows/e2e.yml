@@ -1,4 +1,4 @@
-name: Unit
+name: E2E
 on:
   push:
     branches: [main]
@@ -14,11 +14,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: '.nvmrc'
       - name: Install deps
         uses: bahmutov/npm-install@v1
-      - name: Run lint
-        run: yarn ci:lint
+      - name: Build pkg
+        run: yarn build
+      - name: Run tests
+        run: yarn ci:e2e
