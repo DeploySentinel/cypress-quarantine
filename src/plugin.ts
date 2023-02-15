@@ -85,7 +85,7 @@ export default (
 ): [Cypress.PluginEvents, Cypress.PluginConfigOptions] => {
   const cypressVersion = config['version'];
   const envs = config['env'];
-  const testsToBeQuarantinedPerSpec = new Map<string, Record<string, any>>();
+  const testsToBeQuarantinedPerSpec = new Map<string, Record<string, boolean>>();
   const gitClient = new GitClient({
     // FIXME: this should be optional
     error,
@@ -115,11 +115,14 @@ export default (
             },
             extraConfig.topLevelKey,
           );
-          log(`Fetched skipped tests for spec "${path}" took ${Date.now() - ts} ms`);
+          log(
+            `Fetched skipped tests for spec "${path}" took ${
+              Date.now() - ts
+            } ms`,
+          );
           testsToBeQuarantinedPerSpec.set(path, tests as any);
         }
-      }
-      catch (e) {
+      } catch (e) {
         error(e);
       }
       return null;
