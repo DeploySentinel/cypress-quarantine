@@ -4,7 +4,7 @@ Cypress plugin that helps devs to quarantine tests dynamically
 
 ## Installation
 
-Install the Playwright reporter into your Playwright project.
+Install the Cypress plugin into your Cypress project.
 
 ```sh
 npm install -D @deploysentinel/cypress-quarantine
@@ -37,17 +37,15 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       cyQuarantine(on, config, {
-        // api that tells which tests to skip per spec file
+        // api that tells which tests to skip per spec file (required)
         apiUrl: 'http://localhost:8000/ci/quarantine-tests',
         meta: {
           testFramework: 'cypress',
-          // or any custom static metadata
+          // or any custom static metadata (optional)
         },
-        // specify the method that generates unique test id based on titles
-        // ex: titles: ['describe A', 'test case B'] -> 'describe A > test case B' (stored in db)
-        // default to only test case name (leaf node); 'test case B' in this case
+        // specify the method that generates unique test id based on nested test block titles (optional)
         getTestId: (titles: string[]) => titles.join(' > '),
-        topLevelKey: 'xxx', // optional
+        topLevelKey: 'xxx', // (optional)
       });
       return config;
     },
@@ -66,23 +64,8 @@ The resulting API response should look like
     ...
 }
 ```
-The plugin has the ability to create a distinctive test ID through the use of `getTestId`,
-which is derived from the hierarchical titles of nested tests.
-In the API response, the test ID serves as the primary identifier that corresponds to a boolean value indicating 
-whether the test case should be quarantined or not.
-
-### API Response Top Level Key
-In case the API response includes top level key, for example:
-```
-{
-    data: {
-        'describe A > test case B': true,
-        'describe A > test case C': false,
-        ...
-    }
-}
-```
-Within the plugin configuration, you can include `data` in the `topLevelKey` field.
+The key is a unique test ID derived from `getTestId`.
+And the value indicates whether the test case should be quarantined or not.
 
 ### Custom Metadata
 
