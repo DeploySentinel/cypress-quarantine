@@ -58,6 +58,11 @@
     "*.ts": "eslint"
   },
   "optionalDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/DeploySentinel/cypress-quarantine.git"
+  },
+  "homepage": "https://github.com/DeploySentinel/cypress-quarantine",
   "keywords": [
     "cypress",
     "plugin",
