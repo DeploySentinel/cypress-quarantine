@@ -2,7 +2,7 @@
   "name": "@deploysentinel/cypress-quarantine",
   "license": "MIT",
   "description": "Cypress plugin that helps devs to quarantine tests dynamically",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publishConfig": {
     "access": "public",
     "directory": "dist"

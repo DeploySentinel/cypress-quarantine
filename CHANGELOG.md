@@ -1,5 +1,11 @@
 # @deploysentinel/cypress-quarantine
 
+## 0.1.4
+
+### Patch Changes
+
+- 92d957bd: docs: add description and repository fields in package.json
+
 ## 0.1.3
 
 ### Patch Changes
