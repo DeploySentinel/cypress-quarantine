@@ -1,0 +1,5 @@
+{
+  "tests": {
+    "describe A > visits a website (should be skipped)": true
+  }
+}

@@ -58,7 +58,7 @@ const axiosInstance = buildAxiosInstance({
   maxContentLength: Infinity,
   maxBodyLength: Infinity,
 });
-const fetchSkippedTestCases = async (
+const fetchTestsToBeQuarantined = async (
   url: string,
   payload: {
     path: string;
@@ -85,7 +85,10 @@ export default (
 ): [Cypress.PluginEvents, Cypress.PluginConfigOptions] => {
   const cypressVersion = config['version'];
   const envs = config['env'];
-  const skippedTestCasesPerSpec = new Map<string, Record<string, any>>();
+  const testsToBeQuarantinedPerSpec = new Map<
+    string,
+    Record<string, boolean>
+  >();
   const gitClient = new GitClient({
     // FIXME: this should be optional
     error,
@@ -94,14 +97,15 @@ export default (
   log(`Starting plugin [v${PKG_VERSION}]...`);
 
   on('task', {
-    onSkip: async ({ path, titles }: { path: string; titles: string[] }) => {
+    fetchTestsToBeQuarantined: async (path: string) => {
       try {
         const commitInfo = await gitClient.getCommitInfo();
         // pull from cache
-        let skippedTestCases = skippedTestCasesPerSpec.get(path);
-        if (!skippedTestCases) {
-          log(`Fetching skipped tests for spec: ${path}`);
-          skippedTestCases = await fetchSkippedTestCases(
+        let tests = testsToBeQuarantinedPerSpec.get(path);
+        if (!tests) {
+          const ts = Date.now();
+          log(`Fetching skipped tests for spec "${path}"`);
+          tests = await fetchTestsToBeQuarantined(
             extraConfig.apiUrl,
             {
               path,
@@ -114,12 +118,25 @@ export default (
             },
             extraConfig.topLevelKey,
           );
-          skippedTestCasesPerSpec.set(path, skippedTestCases as any);
+          log(
+            `Fetched skipped tests for spec "${path}" took ${
+              Date.now() - ts
+            } ms`,
+          );
+          testsToBeQuarantinedPerSpec.set(path, tests as any);
         }
-        if (isPlainObject(skippedTestCases)) {
+      } catch (e) {
+        error(e);
+      }
+      return null;
+    },
+    onSkip: ({ path, titles }: { path: string; titles: string[] }) => {
+      try {
+        const tests = testsToBeQuarantinedPerSpec.get(path);
+        if (isPlainObject(tests)) {
           const shouldSkip = Boolean(
             lGet(
-              skippedTestCases,
+              tests,
               extraConfig.getTestId
                 ? extraConfig.getTestId(titles)
                 : titles[titles.length - 1],
