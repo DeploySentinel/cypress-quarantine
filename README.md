@@ -1,10 +1,11 @@
 # DeploySentinel Cypress Quarantine
 
-Cypress plugin that helps devs to quarantine tests dynamically
+DeploySentinel Cypress Quarantine is a plugin for Cypress that helps developers quarantine tests dynamically.
+With this plugin, you can dynamically skip tests that are unstable, flaky, or not ready to run based off an API call made at test time.
 
 ## Installation
 
-Install the Playwright reporter into your Playwright project.
+To install the Cypress plugin, run:
 
 ```sh
 npm install -D @deploysentinel/cypress-quarantine
@@ -37,17 +38,17 @@ export default defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       cyQuarantine(on, config, {
-        // api that tells which tests to skip per spec file
+        // your custom API endpoint that returns which tests to skip per spec file (required)
         apiUrl: 'http://localhost:8000/ci/quarantine-tests',
         meta: {
           testFramework: 'cypress',
-          // or any custom static metadata
+          // or any custom static metadata (optional)
         },
         // specify the method that generates unique test id based on titles
         // ex: titles: ['describe A', 'test case B'] -> 'describe A > test case B' (stored in db)
         // default to only test case name (leaf node); 'test case B' in this case
         getTestId: (titles: string[]) => titles.join(' > '),
-        topLevelKey: 'xxx', // optional
+        topLevelKey: 'xxx', // (optional)
       });
       return config;
     },
@@ -66,13 +67,11 @@ The resulting API response should look like
     ...
 }
 ```
-The plugin has the ability to create a distinctive test ID through the use of `getTestId`,
-which is derived from the hierarchical titles of nested tests.
-In the API response, the test ID serves as the primary identifier that corresponds to a boolean value indicating 
-whether the test case should be quarantined or not.
+The key is a unique test ID derived from `getTestId`.
+And the value indicates whether the test case should be skipped (quarantined).
 
-### API Response Top Level Key
-In case the API response includes top level key, for example:
+### Top Level API Key
+In case the API response has top level key attached, for example:
 ```
 {
     data: {
@@ -82,7 +81,8 @@ In case the API response includes top level key, for example:
     }
 }
 ```
-Within the plugin configuration, you can include `data` in the `topLevelKey` field.
+You can set `topLevelKey` field in config to `data` in this case.
+
 
 ### Custom Metadata
 
